@@ -1,3 +1,10 @@
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -8,8 +15,80 @@ import { ShoppingListService } from '../shopping-list.service';
   selector: 'app-shopping-edit',
   templateUrl: './shopping-edit.component.html',
   styleUrls: ['./shopping-edit.component.css'],
+  animations: [
+    trigger('divState', [
+      state(
+        'normal',
+        style({
+          'background-color': 'red',
+          transform: 'translateX(0)',
+        })
+      ),
+      state(
+        'highlighted',
+        style({
+          'background-color': 'blue',
+          transform: 'translateX(100px)',
+        })
+      ),
+      transition('normal <=> highlighted', animate(300)),
+    ]),
+    trigger('wildState', [
+      state(
+        'normal',
+        style({
+          'background-color': 'red',
+          transform: 'translateX(0) scale(1)',
+        })
+      ),
+      state(
+        'shrunken',
+        style({
+          'background-color': 'green',
+          transform: 'translateX(0) scale(0.5)',
+        })
+      ),
+      state(
+        'highlighted',
+        style({
+          'background-color': 'blue',
+          transform: 'translateX(100px) scale(1)',
+        })
+      ),
+      transition('normal <=> highlighted', animate(300)),
+      transition('shrunken <=> *', [
+        style({
+          'background-color': 'orange',
+        }),
+        animate(
+          1,
+          style({
+            borderRadius: '50px',
+          })
+        ),
+        animate(500),
+      ]),
+    ]),
+  ],
 })
 export class ShoppingEditComponent implements OnInit, OnDestroy {
+  state = 'normal';
+  wildState = 'normal';
+
+  onAnimate() {
+    this.state == 'normal'
+      ? (this.state = 'highlighted')
+      : (this.state = 'normal');
+    this.wildState == 'normal'
+      ? (this.wildState = 'highlighted')
+      : (this.wildState = 'normal');
+  }
+  onShrink() {
+    this.wildState = 'shrunken';
+  }
+
+  animationStarted() {}
+  animationEnded() {}
   @ViewChild('f', { static: false }) slform: NgForm;
   subscription: Subscription;
   editMode = false;
